@@ -1,0 +1,70 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Building {
+  id        String     @id @default(uuid())
+  name      String     @unique
+  floors    Int 
+  rooms     Room[]
+  entrances Entrance[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @default(now())
+}
+
+model Room {
+  id             String           @id @default(uuid())
+  name           String
+  floor          Int
+  building       Building         @relation(fields: [buildingId], references: [id])
+  buildingId     String
+  lat            Float
+  lng            Float
+  type           RoomType
+  neighbors      RoomConnection[] @relation("FromRoom")
+  RoomConnection RoomConnection[] @relation("ToRoom")
+}
+
+enum RoomType {
+  CLASSROOM
+  OFFICE
+  STAIRCASE
+  ELEVATOR
+  ENTRANCE
+}
+
+model RoomConnection {
+  id             String         @id @default(uuid())
+  fromRoom       Room           @relation("FromRoom", fields: [fromRoomId], references: [id])
+  fromRoomId     String
+  toRoom     Room           @relation("ToRoom", fields: [toRoomId], references: [id])
+  toRoomId       String
+  distance       Float
+  connectionType ConnectionType
+}
+
+enum ConnectionType {
+  HALLWAY
+  STAIRS
+  ELEVATOR
+}
+
+model Entrance {
+  id         String   @id @default(uuid())
+  name       String
+  building   Building @relation(fields: [buildingId], references: [id])
+  buildingId String
+  lat        Float
+  lng        Float
+}
