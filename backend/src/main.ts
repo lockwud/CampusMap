@@ -1,9 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { configDotenv } from 'dotenv';
+import { ConfigModule } from '@nestjs/config';
 
-// Load environment variables from .env file
-configDotenv();
+ConfigModule.forRoot();
 const port = process.env.PORT || 3000
 
 async function bootstrap() {
