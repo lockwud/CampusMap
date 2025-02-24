@@ -1,26 +1,41 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateEntranceDto } from './dto/create-entrance.dto';
 import { UpdateEntranceDto } from './dto/update-entrance.dto';
+import { PrismaService } from '../../prisma/prisma.service';
+import { BuildingsService } from "../buildings/buildings.service"
+
 
 @Injectable()
 export class EntrancesService {
-  create(createEntranceDto: CreateEntranceDto) {
-    return 'This action adds a new entrance';
-  }
+    constructor(
+        private prisma: PrismaService,
+        private buildingService: BuildingsService
+    ){
 
-  findAll() {
-    return `This action returns all entrances`;
-  }
+    }
+    async addEntrance(data: CreateEntranceDto){
+        const retrievedBuilding = await this.buildingService.fetchBuildingByName(data.name)
+        if(!retrievedBuilding){
+            throw new NotFoundException("Building not found")
+        }
+        const entrance = await this.prisma.entrance.create({
+            data
+        });
+        return entrance
+    }
 
-  findOne(id: number) {
-    return `This action returns a #${id} entrance`;
-  }
+    async findAllEntrances(){
+        const entrance = await this.prisma.entrance.findMany();
+        return entrance
+    }
 
-  update(id: number, updateEntranceDto: UpdateEntranceDto) {
-    return `This action updates a #${id} entrance`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} entrance`;
-  }
+    async findEntranceById(id: string){
+        const entrance = await this.prisma.entrance.findUnique({
+         where:{
+            id: id
+         }
+        });
+        return entrance
+    }
+  
 }

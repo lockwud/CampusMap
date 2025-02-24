@@ -8,13 +8,25 @@ datasource db {
 }
 
 model Building {
-  id        String     @id @default(uuid())
-  name      String     @unique
-  floors    Int  
-  rooms     Room[]
-  entrances Entrance[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @default(now())
+  id          String     @id @default(uuid())
+  name        String     @unique
+  floors      Int  
+  rooms       Room[]
+  entrances   Entrance[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  Floor Floor[]
+}
+
+model Floor {
+  id          String     @id @default(cuid())
+  number      Int
+  buildingId  String
+  building    Building   @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  rooms       Room[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 }
 
 model Room {
@@ -26,43 +38,59 @@ model Room {
   neighbors        RoomNeighbor[] @relation("RoomNeighborsFrom")
   incomingNeighbors RoomNeighbor[] @relation("RoomNeighborsTo")
   entrances        Entrance[] @relation("RoomEntrances") 
-  buildingId String
-  Building   Building @relation(fields: [buildingId], references: [id])
+  buildingId       String
+  building         Building @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  floorId          String
+  floor            Floor @relation(fields: [floorId], references: [id], onDelete: Cascade)
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
 }
 
 model RoomNeighbor {
-  id        String   @id @default(cuid())
-  room      Room     @relation("RoomNeighborsFrom", fields: [roomId], references: [id])
-  roomId    String
-  toRoom    Room     @relation("RoomNeighborsTo", fields: [toRoomId], references: [id])
-  toRoomId  String
-  distance  Float
-  connectionType String // e.g. "stair", "elevator", "hallway"
+  id             String   @id @default(cuid())
+  room           Room     @relation("RoomNeighborsFrom", fields: [roomId], references: [id], onDelete: Cascade)
+  roomId         String
+  toRoom         Room     @relation("RoomNeighborsTo", fields: [toRoomId], references: [id], onDelete: Cascade)
+  toRoomId       String
+  distance       Float
+  connectionType String   // e.g. "stair", "elevator", "hallway"
 }
 
 model Entrance {
-  id        String   @id @default(cuid())
-  name      String
-  lat       Float
-  lng       Float
-  room      Room     @relation("RoomEntrances", fields: [roomId], references: [id])
-  roomId    String
-  buildingId String
-  Building   Building @relation(fields: [buildingId], references: [id])
+  id          String   @id @default(cuid())
+  name        String
+  lat         Float
+  lng         Float
+  roomId      String?  // Entrance might not be tied to a specific room
+  room        Room?    @relation("RoomEntrances", fields: [roomId], references: [id], onDelete: Cascade)
+  buildingId  String
+  building    Building @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 }
+
 
 model UserPreference {
   id          String   @id @default(cuid())
   userId      String   @unique
-  preference  String   // e.g. "fastest", "scenic", "accessible"
+  preference  preference
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 }
 
 model UserLocation {
-  id       String   @id @default(cuid())
-  userId   String   @unique
-  lat      Float
-  lng      Float
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  lat        Float
+  lng        Float
   buildingId String?
-  roomId   String?
-  updatedAt DateTime @updatedAt
+  roomId     String?
+  updatedAt  DateTime @updatedAt
+}
+
+
+enum preference {
+  fastest
+  scenic 
+  accessible
 }

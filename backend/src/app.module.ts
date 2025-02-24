@@ -10,9 +10,11 @@ import { RoomsModule } from './rooms/rooms.module';
 import { EntrancesModule } from './entrances/entrances.module';
 import { PrismaService } from '../prisma/prisma.service';
 import { PathfindingService } from './path-finder/path-finder.service';
+import { FloorsModule } from './floors/floors.module';
+import { RoomNeighborModule } from './room-neighbor/room-neighbor.module';
 
 @Module({
-  imports: [BuildingsModule, PathFinderModule, RoomsModule, EntrancesModule],
+  imports: [BuildingsModule, PathFinderModule, RoomsModule, EntrancesModule, FloorsModule, RoomNeighborModule],
   controllers: [AppController, GoogleMapsController],
   providers: [AppService, GoogleMapsService, LocationGateway, PrismaService, PathfindingService],
 })
