@@ -38,6 +38,7 @@ export class RoomsService {
     if(!retrievedRoom){
       throw new NotFoundException("Room not found")
     }
+    return retrievedRoom;
   }
 
 }
