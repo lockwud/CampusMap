@@ -13,23 +13,49 @@ export class FloorsService {
       where: { id: data.buildingId },
       include: { Floor: true },
     });
-
+  
     if (!building) {
       throw new NotFoundException('Building not found');
     }
-
+  
     if (data.number > building.floors || data.number === 0) {
-      throw new BadRequestException('Number exceeds the total floors in the building or floor can\'nt be 0');
+      throw new BadRequestException(
+        "Number exceeds the total floors in the building or floor can't be 0"
+      );
     }
-
-    const newFloor =  this.prisma.floor.create({
+  
+    // Check if the floor number already exists in the building
+    const existingFloor = await this.prisma.floor.findFirst({
+      where: {
+        number: data.number,
+        buildingId: data.buildingId,
+      },
+    });
+  
+    if (existingFloor) {
+      throw new BadRequestException(`Floor number ${data.number} already exists in this building`);
+    }
+  
+    // Create the new floor
+    const newFloor = await this.prisma.floor.create({
       data: {
         number: data.number,
         buildingId: data.buildingId,
       },
     });
-    return newFloor
-  }
+  
+    // Increment the floor count in the building
+    await this.prisma.building.update({
+      where: { id: data.buildingId },
+      data: {
+        floors: {
+          increment: 1, // Increment the floor count
+        },
+      },
+    });
+  
+    return newFloor;
+  }  
 
   async findAllFloors() {
     return this.prisma.floor.findMany({ include: { building: true, rooms: true } });
