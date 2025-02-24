@@ -41,4 +41,22 @@ export class RoomsService {
     return retrievedRoom;
   }
 
+  async updateRoom (id: string, data: UpdateRoomDto){
+    const room = await this.prisma.room.findUnique({
+      where:{
+        id: id
+      }
+    })
+    if (!room){
+      throw new NotFoundException("Room not found")
+    }
+    const updatedRoom = await this.prisma.room.update({
+      where:{
+        id: id
+      },
+      data: data
+    })
+    return updatedRoom
+  }
+
 }
