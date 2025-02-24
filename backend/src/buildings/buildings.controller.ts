@@ -36,8 +36,8 @@ export class BuildingsController {
     })
   }
 
-  @Get('name')
-  async retrieveBuildingByName(@Query('name') name: string,  @Req() req: Request, @Res() res: Response){
+  @Get(':name/name')
+  async retrieveBuildingByName(@Param('name') name: string,  @Req() req: Request, @Res() res: Response){
     const building = await this.buildingsService.fetchBuildingByName(name)
     res.status(HttpStatusCode.Ok).json({
       building
