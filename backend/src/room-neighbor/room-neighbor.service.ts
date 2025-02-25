@@ -16,7 +16,8 @@ export class RoomNeighborService {
     const toRoom = await this.prisma.room.findUnique({ where: { id: data.toRoomId } });
     if (!toRoom) {throw new NotFoundException('Target Room not found');}
 
-    return this.prisma.roomNeighbor.create({ data });
+    const roomNeighbor = await this.prisma.roomNeighbor.create({ data });
+    return roomNeighbor
   }
 
   async findAllNeighbors() {
