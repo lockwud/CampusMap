@@ -14,7 +14,7 @@ export class EntrancesService {
 
     }
     async addEntrance(data: CreateEntranceDto){
-        const retrievedBuilding = await this.buildingService.fetchBuildingByName(data.name)
+        const retrievedBuilding = await this.buildingService.findBuildingById(data.buildingId)
         if(!retrievedBuilding){
             throw new NotFoundException("Building not found")
         }
