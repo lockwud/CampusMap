@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import Graph from 'graphology';
+import  Graph  from 'graphology';
 import dijkstra from 'graphology-shortest-path/dijkstra';
 
 @Injectable()
